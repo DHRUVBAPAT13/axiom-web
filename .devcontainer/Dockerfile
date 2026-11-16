@@ -22,7 +22,7 @@ RUN dnf -y upgrade --refresh && \
     java-latest-openjdk-devel \
     maven \
     gradle \
-    dotnet-sdk-9.0 \
+    dotnet-sdk-10.0 \
     sqlite \
     postgresql \
     mariadb \
