@@ -17,6 +17,8 @@ RUN dnf -y upgrade --refresh && \
     python3 \
     python3-pip \
     python3-devel \
+    python3-setuptools \
+    python3-wheel \
     golang \
     java-latest-openjdk-devel \
     maven \
@@ -76,8 +78,6 @@ COPY --chown=$USERNAME:$USERNAME starship.toml /home/$USERNAME/.config/starship.
 
 # Install latest Rust toolchain via rustup
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/home/${USERNAME}/.cargo/bin:/home/${USERNAME}/go/bin:${PATH}"
-
-# Install common Go & Python dev tools
-RUN go install golang.org/x/tools/gopls@latest && \
-    pip3 install --user --upgrade pip setuptools wheel
+ENV GOPATH="/home/${USERNAME}/go"
+ENV GOTOOLCHAIN=local
+ENV PATH="/home/${USERNAME}/.cargo/bin:${GOPATH}/bin:${PATH}"
