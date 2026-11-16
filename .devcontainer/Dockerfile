@@ -1,8 +1,7 @@
-FROM fedora:latest
+FROM fedora:44
 
 # Avoid interactive prompts and update base system
 RUN dnf -y upgrade --refresh && \
-    # Install build-essentials equivalents, compilers, runtimes, and SQL clients
     dnf -y install \
     @development-tools \
     gcc \
@@ -21,8 +20,6 @@ RUN dnf -y upgrade --refresh && \
     golang \
     java-latest-openjdk-devel \
     maven \
-    gradle \
-    dotnet-sdk-10.0 \
     sqlite \
     postgresql \
     mariadb \
@@ -33,8 +30,27 @@ RUN dnf -y upgrade --refresh && \
     tar \
     sudo \
     which \
-    procps-ng && \
+    procps-ng \
+    icu \
+    libicu \
+    krb5-libs \
+    openssl-libs \
+    zlib && \
     dnf clean all
+
+# Install latest .NET SDK via Microsoft's official installer script
+RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && \
+    chmod +x /tmp/dotnet-install.sh && \
+    /tmp/dotnet-install.sh --channel STS --install-dir /usr/share/dotnet && \
+    ln -s /usr/share/dotnet/dotnet /usr/local/bin/dotnet && \
+    rm -f /tmp/dotnet-install.sh
+
+# Install Gradle directly from official release archive
+ARG GRADLE_VERSION=8.12
+RUN curl -fsSL "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -o /tmp/gradle.zip && \
+    unzip -q /tmp/gradle.zip -d /opt && \
+    ln -s "/opt/gradle-${GRADLE_VERSION}/bin/gradle" /usr/local/bin/gradle && \
+    rm -f /tmp/gradle.zip
 
 # Install Ollama CLI and Starship prompt
 RUN curl -fsSL https://ollama.com/install.sh | sh && \
